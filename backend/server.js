@@ -1,6 +1,5 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const cors = require("cors");
 const connectDB = require("./config/db");
 const { errorHandler } = require("./middleware/errorMiddleware");
 
@@ -9,18 +8,16 @@ connectDB();
 
 const app = express();
 
-// ✅ Fix CORS - put this BEFORE all routes
-app.use(
-  cors({
-    origin: "https://employee-ai-system-gttx.onrender.com",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  }),
-);
-
-// Handle preflight requests
-app.options("*", cors());
+// ✅ Nuclear CORS fix - manually set headers on every request
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 app.use(express.json());
 
